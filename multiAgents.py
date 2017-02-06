@@ -41,13 +41,32 @@ class ReflexAgent(Agent):
         # Collect legal moves and successor states
         legalMoves = gameState.getLegalActions()
 
+        # print "Legal Moves at the moment: ", legalMoves
+
         # Choose one of the best actions
+
+        # Given a State and an action, returns the score of that specific action
+        # Iterates the list of legatMoves, saving in scores the cost of each action
+        # EvaluationFunction Called
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
+        # print "Move Scores:               ", scores
+
         bestScore = max(scores)
+        # print "Best scores: ", bestScore
+
+        # Stores an array of the indices that correspond to the best score
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
-        chosenIndex = random.choice(bestIndices) # Pick randomly among the best
+        # print "Best indices: ", bestIndices
+
+        # Pick randomly among the best
+        chosenIndex = random.choice(bestIndices)
+        # print "Chosen Index: ", chosenIndex
 
         "Add more of your code here if you want to"
+
+        # print "Chosen Move: ", legalMoves[chosenIndex]
+
+        # print "************************************"
 
         return legalMoves[chosenIndex]
 
@@ -68,12 +87,46 @@ class ReflexAgent(Agent):
         """
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
+
         newPos = successorGameState.getPacmanPosition()
+        # print "Current Pos", currentGameState.getPacmanPosition()
+        # print "New Pos: ", newPos
+
+        # Stores in a Matrix information about the Food remaining in the map
+        # T means Food and F means No Food.
         newFood = successorGameState.getFood()
+        # print newFood
+
         newGhostStates = successorGameState.getGhostStates()
+        # print newGhostStates
+
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        # print "Scared Ghosts Timer: ", newGhostStates
 
         "*** YOUR CODE HERE ***"
+
+        nearestFood = None
+        disFromNearestFood = None
+        print currentGameState.getPacmanPosition()
+        print currentGameState.getFood().asList()
+        print "********"
+        for food in currentGameState.getFood().asList():
+            tmp = util.manhattanDistance(food, currentGameState.getPacmanPosition())
+            if (disFromNearestFood == None or disFromNearestFood > tmp):
+                disFromNearestFood = tmp
+                nearestFood = food
+
+        disFromNearestFoodNew = manhattanDistance(nearestFood, newPos)
+
+
+
+        # New Return:
+        # for food in currentGameState.getFood().asList():
+            # Si el siguiente Estado es una comida, directamente ir a ese.
+        # return disFromNearestFoodNew
+
+
+        # Old Return:
         return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState):
