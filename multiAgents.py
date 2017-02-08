@@ -105,29 +105,35 @@ class ReflexAgent(Agent):
 
         "*** YOUR CODE HERE ***"
 
+        # The idea is to get that if a position is close from food, we return a high value and if it is far, a small value
+        # We also have to consider the ghosts. If there are a ghost nearby a position, we should give it less points.
+
+        # Level of fear that the pacman will feel towards the ghosts.
+        fearLevel = 7
+        ghostMod = 2
+
         nearestFood = None
         disFromNearestFood = None
-        print currentGameState.getPacmanPosition()
-        print currentGameState.getFood().asList()
-        print "********"
+
         for food in currentGameState.getFood().asList():
-            tmp = util.manhattanDistance(food, currentGameState.getPacmanPosition())
+            tmp = manhattanDistance(food, currentGameState.getPacmanPosition())
             if (disFromNearestFood == None or disFromNearestFood > tmp):
                 disFromNearestFood = tmp
                 nearestFood = food
 
         disFromNearestFoodNew = manhattanDistance(nearestFood, newPos)
 
+        ghostEval = 0
+
+        for ghost in newGhostStates:
+            # if ghost.scaredTimer <= 0:
+            if (manhattanDistance(newPos, ghost.getPosition()) <= fearLevel):
+                ghostEval -= ghostMod * (fearLevel - manhattanDistance(newPos, ghost.getPosition()))
 
 
-        # New Return:
-        # for food in currentGameState.getFood().asList():
-            # Si el siguiente Estado es una comida, directamente ir a ese.
-        # return disFromNearestFoodNew
+        return ghostEval - disFromNearestFoodNew
 
 
-        # Old Return:
-        return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState):
     """
