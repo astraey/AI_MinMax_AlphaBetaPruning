@@ -109,29 +109,49 @@ class ReflexAgent(Agent):
         # We also have to consider the ghosts. If there are a ghost nearby a position, we should give it less points.
 
         # Level of fear that the pacman will feel towards the ghosts.
-        fearLevel = 7
-        ghostMod = 2
+        fearLevel = 4
+        ghostModifier = 3
 
-        nearestFood = None
-        disFromNearestFood = None
+        closestFood = None
+        disClosestFood = None
 
+        ghostsNearby = False
+
+        # We store in food the x,y values for the closest food
         for food in currentGameState.getFood().asList():
-            tmp = manhattanDistance(food, currentGameState.getPacmanPosition())
-            if (disFromNearestFood == None or disFromNearestFood > tmp):
-                disFromNearestFood = tmp
-                nearestFood = food
 
-        disFromNearestFoodNew = manhattanDistance(nearestFood, newPos)
+            if disClosestFood > manhattanDistance(food, currentGameState.getPacmanPosition()) or disClosestFood == None:
+                closestFood = food
 
-        ghostEval = 0
+        # Distance from closest food to the evaluated position
+        disClosestFood = manhattanDistance(closestFood, newPos)
 
+        # Value that reflects the danger of a position, depending on the ghosts
+        danger = 0
+
+
+        # fearLevel is a variable that represents how far the pacman will consider that a ghost is dangerous.
+        # If the distance between the evaluated position and the ghosts surpasses the fear level, the ghost will be ignored.
+        # A low FearLevel means that the pacman will not change its behaviour unless the ghost is really close.
         for ghost in newGhostStates:
-            # if ghost.scaredTimer <= 0:
             if (manhattanDistance(newPos, ghost.getPosition()) <= fearLevel):
-                ghostEval -= ghostMod * (fearLevel - manhattanDistance(newPos, ghost.getPosition()))
+                danger -= ghostModifier * (fearLevel - manhattanDistance(newPos, ghost.getPosition()))
+                ghostsNearby = True
 
 
-        return ghostEval - disFromNearestFoodNew
+
+        if ghostsNearby:
+            print "We are not SAFE!!! ", danger - disClosestFood
+            return danger - disClosestFood
+        elif newPos == currentGameState.getPacmanPosition():
+                print "We will not stop here!"
+                return -999
+
+
+
+        else:
+            print "We are safe: ", 50 - disClosestFood
+            return 50 - disClosestFood
 
 
 
