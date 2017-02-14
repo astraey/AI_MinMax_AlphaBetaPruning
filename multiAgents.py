@@ -191,6 +191,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
 
     def getAction(self, gameState):
+
         """
           Returns the minimax action from the current gameState using self.depth
           and self.evaluationFunction.
@@ -208,7 +209,35 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def minval(legalMoves):
+            result = 99999999
+            if gameState.isLose() or gameState.isWin() or depth == 0:
+                return self.evaluationFunction(gameState)
+
+            for move in legalMoves:
+                successor = gameState.generatePacmanSuccessor()
+                result = min(result, maxval())
+
+
+            return result
+
+        def maxval():
+            result = -99999999
+
+            return result
+
+
+        print self.evaluationFunction(gameState)
+        legalMoves = gameState.getLegalPacmanActions()
+        bestMove = Directions.STOP
+        score = -9999999
+
+        score = max(score,minval(legalMoves))
+
+
+
+        return bestMove
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
