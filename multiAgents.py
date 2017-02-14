@@ -141,16 +141,16 @@ class ReflexAgent(Agent):
 
 
         if ghostsNearby:
-            print "We are not SAFE!!! ", danger - disClosestFood
+            # print "We are not SAFE!!! ", danger - disClosestFood
             return danger - disClosestFood
         elif newPos == currentGameState.getPacmanPosition():
-                print "We will not stop here!"
+                # print "We will not stop here!"
                 return -999
 
 
 
         else:
-            print "We are safe: ", 50 - disClosestFood
+            # print "We are safe: ", 50 - disClosestFood
             return 50 - disClosestFood
 
 
