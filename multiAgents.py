@@ -151,67 +151,47 @@ class MinimaxAgent(MultiAgentSearchAgent):
         #-----------------------------------------------------------------------------#
 
 
-        def minval(successor, depth, index_agent):
-            legalMoves = successor.getLegalActions(index_agent)
-            numghosts = successor.getNumAgents() - 1
-            score = 999999999999
-            if successor.isWin() or successor.isLose() or depth == 0:
-                return self.evaluationFunction(successor)
-            if (index_agent > 0):
-                for Move in legalMoves:
-                    # print "index_agent"
-                    # print index_agent
-                    score = min(score, minval(successor.generateSuccessor(index_agent, Move), depth, index_agent - 1))
+        def minval(gameState, depth, agent):
+
+            if gameState.isLose() or gameState.isWin() or depth == 0:
+                return self.evaluationFunction(gameState)
+            result = 99999999
+            if agent != gameState.getNumAgents()-1:
+                legalMoves = gameState.getLegalActions(agent)
+                for move in legalMoves:
+                    result = min(result, minval(gameState.generateSuccessor(agent, move), depth, agent+1))
             else:
-
-                for Move in legalMoves:
-                    score = min(score, maxval(successor.generateSuccessor(index_agent, Move), depth - 1))
-            #print "score minval"
-            #print score
-
-            return score
-
-        def maxval(successor, depth):
-            legalMoves = successor.getLegalActions(0)
-            numghosts = successor.getNumAgents() - 1
-            score = -999999999999
-            if successor.isWin() or successor.isLose() or depth == 0:
-                return self.evaluationFunction(successor)
-            for Move in legalMoves:
-                score = max(score, minval(successor.generateSuccessor(0, Move), depth-1, numghosts))
-            #print "score maxval"
-            #print score
-            return score
-
-
-        legalMoves = gameState.getLegalActions()
-        numghosts = gameState.getNumAgents() - 1
-        bestmove = Directions.STOP
-        score = -999999999999
-        for Move in legalMoves:
-            #print "for move"
-            #print Move
-            prevscore = score
-            # sucesor(indice agente, movimiento), profundidad, indice agente, numero fantasmas
-            score = max(score, minval(gameState.generateSuccessor(0, Move), self.depth, numghosts))
-            #print "succesor"
-            #print gameState.generateSuccessor(0, Move)
-            #print "numero fantasmas"
-            #print numghosts
-            #print "prevscore"
-            #print prevscore
-            #print "score"
-            #print score
-            if score > prevscore:
-                #print "if bestmove"
-                #print Move
-                bestmove = Move
+                legalMoves = gameState.getLegalActions(agent)
+                for move in legalMoves:
+                    result = min(result, maxval(gameState.generateSuccessor(agent, move), depth-1))
+            return result
 
 
 
-        #print "bestmove"
-        #print bestmove
-        return bestmove
+
+
+            return result
+
+        def maxval(gameState, depth):
+            if gameState.isLose() or gameState.isWin() or depth == 0:
+                return self.evaluationFunction(gameState)
+            result = -99999999
+            legalMoves = gameState.getLegalActions(0)
+            for move in legalMoves:
+                result = max(result, minval(gameState.generateSuccessor(0, move), depth-1, 1))
+            return result
+
+
+        legalMoves = gameState.getLegalActions(0)
+
+        bestMove = Directions.STOP
+        score = -9999999
+        for move in legalMoves:
+            scoreprov = max(score, minval(gameState.generateSuccessor(0,move), self.depth, 1))
+            if scoreprov > score:
+                score = scoreprov
+                bestMove = move
+        return bestMove
 
 
 
