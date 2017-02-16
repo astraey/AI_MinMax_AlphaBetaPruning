@@ -253,7 +253,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
-      Your expectimax agent (question 4)
+      Your s expectimax agent (question 4)
     """
 
     def getAction(self, gameState):
