@@ -289,7 +289,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 if result < alpha:
                     return result
                 beta = min(beta, result)
-        else:
+        elif agent == gameState.getNumAgents() - 1:   
             legalMoves = gameState.getLegalActions(agent)
             for move in legalMoves:
                 result = min(result, self.max(gameState.generateSuccessor(agent, move), depth - 1, alpha, beta))
