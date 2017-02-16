@@ -178,7 +178,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
             result = -99999999
             legalMoves = gameState.getLegalActions(0)
             for move in legalMoves:
-                result = max(result, minval(gameState.generateSuccessor(0, move), depth-1, 1))
+                result = max(result, minval(gameState.generateSuccessor(0, move), depth, 1))
             return result
 
 
