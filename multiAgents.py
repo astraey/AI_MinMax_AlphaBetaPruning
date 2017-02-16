@@ -75,12 +75,14 @@ class ReflexAgent(Agent):
 
         "*** Our Code Starts Here ***"
 
-        # The idea is to get that if a position is close from food, we return a high value and if it is far, a small value
-        # We also have to consider the ghosts. If there are a ghost nearby a position, we should give it less points.
+        # The idea is to get that if a position is close from food, we return a high value and if it is far, a small
+        # value. We also have to consider the ghosts. If there are a ghost nearby a position, we should give it less
+        # points.
 
-        # Level of fear that the pacman will feel towards the ghosts.
+        # Level of fear that the pacman will feel towards the ghosts. It is also the range of vision of the pacman
         fearLevel = 4
-        ghostModifier = 3
+
+
 
         closestFood = None
         disClosestFood = None
@@ -96,32 +98,41 @@ class ReflexAgent(Agent):
         # Distance from closest food to the evaluated position
         disClosestFood = manhattanDistance(closestFood, newPos)
 
-        # Value that reflects the danger of a position, depending on the ghosts
-        danger = 0
 
+        # Value that reflects how safe a position is, depending on the ghosts
+        safeness = 0
 
         # fearLevel is a variable that represents how far the pacman will consider that a ghost is dangerous.
-        # If the distance between the evaluated position and the ghosts surpasses the fear level, the ghost will be ignored.
+        # If the distance between the evaluated position and the ghosts surpasses the fear level, the ghost will
+        # be ignored.
         # A low FearLevel means that the pacman will not change its behaviour unless the ghost is really close.
+
+        # If the distances betweem the ghosts and the new positions are long, this will reflect on a high level
+        # of safeness
+
         for ghost in newGhostStates:
-            if (manhattanDistance(newPos, ghost.getPosition()) <= fearLevel):
-                danger -= ghostModifier * (fearLevel - manhattanDistance(newPos, ghost.getPosition()))
+            if manhattanDistance(newPos, ghost.getPosition()) <= fearLevel:
+
+                safeness += manhattanDistance(newPos, ghost.getPosition())
+
                 ghostsNearby = True
 
-
-
         if ghostsNearby:
-            # print "We are not SAFE!!! ", danger - disClosestFood
-            return danger - disClosestFood
+
+            # The level of safeness minus the distance to the closest food gives us an idea of how good this
+            # choice is.
+            return safeness - disClosestFood
+
         elif newPos == currentGameState.getPacmanPosition():
-                # print "We will not stop here!"
+
+                #If the Pacman Was not going to move, now it will move for sure
                 return -999
 
-
-
         else:
-            # print "We are safe: ", 50 - disClosestFood
-            return 50 - disClosestFood
+
+            # If there are no ghosts nearby, the position with has food the closest will get a higher score
+            return 70 - disClosestFood
+
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -197,48 +208,43 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         #-----------------------------------------------------------------------------#
 
-
-        def minval(gameState, depth, agent):
-
-            if gameState.isLose() or gameState.isWin() or depth == 0:
-                return self.evaluationFunction(gameState)
-            result = 99999999
-            if agent != gameState.getNumAgents()-1:
-                legalMoves = gameState.getLegalActions(agent)
-                for move in legalMoves:
-                    result = min(result, minval(gameState.generateSuccessor(agent, move), depth, agent+1))
-            else:
-                legalMoves = gameState.getLegalActions(agent)
-                for move in legalMoves:
-                    result = min(result, maxval(gameState.generateSuccessor(agent, move), depth-1))
-            return result
-
-
-
-
-
-            return result
-
-        def maxval(gameState, depth):
-            if gameState.isLose() or gameState.isWin() or depth == 0:
-                return self.evaluationFunction(gameState)
-            result = -99999999
-            legalMoves = gameState.getLegalActions(0)
-            for move in legalMoves:
-                result = max(result, minval(gameState.generateSuccessor(0, move), depth, 1))
-            return result
-
-
         legalMoves = gameState.getLegalActions(0)
 
         bestMove = Directions.STOP
         score = -9999999
         for move in legalMoves:
-            scoreprov = max(score, minval(gameState.generateSuccessor(0,move), self.depth, 1))
+            scoreprov = max(score, self.minval(gameState.generateSuccessor(0, move), self.depth, 1))
             if scoreprov > score:
                 score = scoreprov
                 bestMove = move
         return bestMove
+
+    def minval(self, gameState, depth, agent):
+
+        if gameState.isLose() or gameState.isWin() or depth == 0:
+            return self.evaluationFunction(gameState)
+        result = 99999999
+        if agent != gameState.getNumAgents() - 1:
+            legalMoves = gameState.getLegalActions(agent)
+            for move in legalMoves:
+                result = min(result, self.minval(gameState.generateSuccessor(agent, move), depth, agent + 1))
+        else:
+            legalMoves = gameState.getLegalActions(agent)
+            for move in legalMoves:
+                result = min(result, self.maxval(gameState.generateSuccessor(agent, move), depth - 1))
+        return result
+
+
+    def maxval(self, gameState, depth):
+        if gameState.isLose() or gameState.isWin() or depth == 0:
+            return self.evaluationFunction(gameState)
+        result = -99999999
+        legalMoves = gameState.getLegalActions(0)
+        for move in legalMoves:
+            result = max(result, self.minval(gameState.generateSuccessor(0, move), depth, 1))
+        return result
+
+
 
 
 
