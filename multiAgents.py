@@ -103,7 +103,7 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
         # print "Scared Ghosts Timer: ", newGhostStates
 
-        "*** YOUR CODE HERE ***"
+        "*** Our Code Starts Here ***"
 
         # The idea is to get that if a position is close from food, we return a high value and if it is far, a small value
         # We also have to consider the ghosts. If there are a ghost nearby a position, we should give it less points.
@@ -208,36 +208,66 @@ class MinimaxAgent(MultiAgentSearchAgent):
           gameState.getNumAgents():
             Returns the total number of agents in the game
         """
-        "*** YOUR CODE HERE ***"
+        "*** Our Code Starts Here ***"
 
-        def minval(legalMoves):
-            result = 99999999
-            if gameState.isLose() or gameState.isWin() or depth == 0:
-                return self.evaluationFunction(gameState)
+        # ***********************
 
-            for move in legalMoves:
-                successor = gameState.generatePacmanSuccessor()
-                result = min(result, maxval())
+        temp = self.max(0, gameState)
 
+        # print temp[1]
 
-            return result
-
-        def maxval():
-            result = -99999999
-
-            return result
-
-
-        print self.evaluationFunction(gameState)
-        legalMoves = gameState.getLegalPacmanActions()
-        bestMove = Directions.STOP
-        score = -9999999
-
-        score = max(score,minval(legalMoves))
+        return temp[1]
 
 
 
-        return bestMove
+    def max(self, depthCounter, gameState):
+
+
+        if depthCounter == self.depth:
+            # print self.evaluationFunction(gameState)
+            return self.evaluationFunction(gameState), None
+
+        legalMoves = gameState.getLegalActions(0)
+        topScore = -99999999
+        bestAction = None
+
+        if len(legalMoves) <= 0:
+            return self.evaluationFunction(gameState), None
+
+        for action in legalMoves:
+            newState = gameState.generateSuccessor(0, action)
+
+            newScore = self.min(newState, 1, depthCounter)[0]
+            if newScore > topScore:
+                topScore, bestAction = newScore, action
+        return topScore, bestAction
+
+
+
+    def min(self, gameState, ID, depthCounter):
+        legalMoves = gameState.getLegalActions(ID)
+        topScore = 99999999
+        bestAction = None
+
+        if len(legalMoves) <= 0:
+            return self.evaluationFunction(gameState), None
+
+        for action in legalMoves:
+            newState = gameState.generateSuccessor(ID, action)
+            if ID == gameState.getNumAgents() - 1:
+
+                newScore = self.max(depthCounter + 1, newState)[0]
+
+            else:
+
+                newScore = self.min(newState, ID + 1, depthCounter)[0]
+
+            if newScore < topScore:
+                topScore, bestAction = newScore, action
+
+        return topScore, bestAction
+
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
