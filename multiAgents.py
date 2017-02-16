@@ -208,43 +208,61 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         #-----------------------------------------------------------------------------#
 
+        # We get the PacMan Legal actions
         legalMoves = gameState.getLegalActions(0)
 
+        # For now, we asume that the best direction for the PacMan is to stay still
         bestMove = Directions.STOP
-        score = -9999999
+
+        # We execute the first max manually
+        topScore = -9999999
+
+        # For every possible move of the PacMan, we chose the one with the best score and we return its move
         for move in legalMoves:
-            scoreprov = max(score, self.minval(gameState.generateSuccessor(0, move), self.depth, 1))
-            if scoreprov > score:
-                score = scoreprov
+
+            scoreTemp = max(topScore, self.minval(gameState.generateSuccessor(0, move), self.depth, 1))
+            if scoreTemp > topScore:
+                topScore = scoreTemp
                 bestMove = move
         return bestMove
 
+
+    # For every possible move of every agent, we return the min score of the potential move
     def minval(self, gameState, depth, agent):
 
-        if gameState.isLose() or gameState.isWin() or depth == 0:
-            return self.evaluationFunction(gameState)
         result = 99999999
+
+        if gameState.isLose() or gameState.isWin() or depth <= 0:
+            return self.evaluationFunction(gameState)
+
+        # We update the variable result with every ghost
         if agent != gameState.getNumAgents() - 1:
             legalMoves = gameState.getLegalActions(agent)
+
+            # For every posible move of the agent, we update resutl with the one with the minimum value
             for move in legalMoves:
                 result = min(result, self.minval(gameState.generateSuccessor(agent, move), depth, agent + 1))
-        else:
+
+        # When we reach the last ghost, we
+        elif agent == gameState.getNumAgents() - 1:
             legalMoves = gameState.getLegalActions(agent)
             for move in legalMoves:
                 result = min(result, self.maxval(gameState.generateSuccessor(agent, move), depth - 1))
+
         return result
 
 
     def maxval(self, gameState, depth):
-        if gameState.isLose() or gameState.isWin() or depth == 0:
-            return self.evaluationFunction(gameState)
+
         result = -99999999
+
+        if gameState.isLose() or gameState.isWin() or depth <= 0:
+            return self.evaluationFunction(gameState)
+
         legalMoves = gameState.getLegalActions(0)
         for move in legalMoves:
             result = max(result, self.minval(gameState.generateSuccessor(0, move), depth, 1))
         return result
-
-
 
 
 
