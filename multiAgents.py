@@ -205,7 +205,51 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def minval(gameState, depth, agent, alpha, beta):
+
+            if gameState.isLose() or gameState.isWin() or depth == 0:
+                return self.evaluationFunction(gameState)
+            result = 99999999
+            if agent != gameState.getNumAgents() - 1:
+                legalMoves = gameState.getLegalActions(agent)
+                for move in legalMoves:
+                    result = min(result, minval(gameState.generateSuccessor(agent, move), depth, agent + 1, alpha, beta))
+                    if result < alpha:
+                        return result
+                    beta = min(beta, result)
+            else:
+                legalMoves = gameState.getLegalActions(agent)
+                for move in legalMoves:
+                    result = min(result, maxval(gameState.generateSuccessor(agent, move), depth - 1, alpha, beta))
+            return result
+
+            return result
+
+        def maxval(gameState, depth, alpha, beta):
+            if gameState.isLose() or gameState.isWin() or depth == 0:
+                return self.evaluationFunction(gameState)
+            result = -99999999
+            legalMoves = gameState.getLegalActions(0)
+            for move in legalMoves:
+                result = max(result, minval(gameState.generateSuccessor(0, move), depth, 1, alpha, beta))
+                if result > beta:
+                    return result
+                alpha = max(alpha, result)
+            return result
+
+        legalMoves = gameState.getLegalActions(0)
+
+        bestMove = Directions.STOP
+        score = -9999999
+        alpha = 9999999
+        beta = -9999999
+        for move in legalMoves:
+            scoreprov = max(score, minval(gameState.generateSuccessor(0, move), self.depth, 1, alpha, beta))
+            if scoreprov > score:
+                score = scoreprov
+                bestMove = move
+        return bestMove
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
